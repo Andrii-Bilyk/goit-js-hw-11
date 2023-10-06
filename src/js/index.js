@@ -1,5 +1,3 @@
-// app.js
-
 import Notiflix from 'notiflix';
 import { fetchDataFromURL, createURL } from './api';
 import { createImageCard, initializeLightbox } from './markup';
@@ -15,39 +13,44 @@ function showMessage(message, category) {
   Notiflix.Notify[category](message);
 }
 
-function searchImages(query) {
+async function searchImages(query,) {
   const url = createURL(API_KEY, query, page);
 
-  fetchDataFromURL(url)
-    .then(data => {
-      if (data.hits.length === 0) {
-        if (page === 1) {
-          gallery.innerHTML = '';
-          showMessage("Sorry, there are no images matching your search query. Please try again.", "failure");
-          loadMoreBtn.style.display = "none";
-        }
-        return;
-      }
+  try {
+    const data = await fetchDataFromURL(url);
 
+    if (data.hits.length === 0) {
       if (page === 1) {
         gallery.innerHTML = '';
-        showMessage(`Hooray! We found ${data.totalHits} images.`, "success");
-      }
-
-      if (data.totalHits > page * 40) {
-        loadMoreBtn.style.display = "block";
+        showMessage("Sorry, there are no images matching your search query. Please try again.", "failure");
+        loadMoreBtn.style.display = "none";
       } else {
         loadMoreBtn.style.display = "none";
+        showMessage("We're sorry, but you've reached the end of search results.", "info");
       }
+      return;
+    }
 
-      const images = data.hits.map(image => createImageCard(image));
-      gallery.innerHTML += images.join('');
+    if (page === 1) {
+      gallery.innerHTML = '';
+      showMessage(`Hooray! We found ${data.totalHits} images.`, "success");
+    }
 
-      initializeLightbox();
-    })
-    .catch(error => {
-      console.error("Error fetching images:", error);
-    });
+    if (data.totalHits > page * 40) {
+      loadMoreBtn.style.display = "block";
+    } else {
+           loadMoreBtn.style.display = "none";
+      showMessage("We're sorry, but you've reached the end of search results.", "info");
+    }
+
+    const images = data.hits.map(image => createImageCard(image));
+    gallery.innerHTML += images.join('');
+    lightboxInstance.refresh();
+
+    initializeLightbox();
+  } catch (error) {
+    console.error("Error fetching images:", error);
+  }
 }
 
 form.addEventListener("submit", function (e) {
