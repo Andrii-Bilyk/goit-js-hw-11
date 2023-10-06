@@ -1,11 +1,18 @@
 import Notiflix from 'notiflix';
 import { fetchDataFromURL, createURL } from './api';
-import { createImageCard, initializeLightbox } from './markup';
+import { createImageCard } from './markup';
+import SimpleLightbox from "simplelightbox";
+import "simplelightbox/dist/simple-lightbox.min.css";
 
 const form = document.getElementById("search-form");
 const gallery = document.querySelector(".gallery");
 const loadMoreBtn = document.querySelector(".load-more");
 const API_KEY = "39851932-ce9b346420218ff82d4578a42";
+
+const lightboxInstance = new SimpleLightbox('.gallery a[data-lightbox="image"]', {
+  captionsDelay: 250,
+  captionsData: 'alt',
+});
 
 let page = 1;
 
@@ -47,7 +54,6 @@ async function searchImages(query,) {
     gallery.innerHTML += images.join('');
     lightboxInstance.refresh();
 
-    initializeLightbox();
   } catch (error) {
     console.error("Error fetching images:", error);
   }
@@ -71,5 +77,6 @@ loadMoreBtn.addEventListener("click", function () {
   const searchQuery = form.searchQuery.value.trim();
   if (searchQuery) {
     searchImages(searchQuery);
+    lightboxInstance.refresh();
   }
 });

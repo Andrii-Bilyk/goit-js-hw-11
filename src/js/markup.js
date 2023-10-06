@@ -1,5 +1,4 @@
-import SimpleLightbox from "simplelightbox";
-import "simplelightbox/dist/simple-lightbox.min.css";
+
 
 export function createImageCard(image) {
   return `
@@ -16,15 +15,3 @@ export function createImageCard(image) {
     </div>
   `;
 }
-let lightboxInstance;
-export function initializeLightbox() {
-  lightboxInstance = new SimpleLightbox('.gallery a[data-lightbox="image"]', {
-    captions: true,
-    captionsData: 'alt',
-  });
-  return lightboxInstance;
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-  initializeLightbox();
-});
